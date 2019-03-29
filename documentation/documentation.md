@@ -34,9 +34,17 @@ An Arduino will be running code to control the speed of a peristaltic pump, and 
 
 ## Hours, Tasks, Notes:
 
+### March 28th 2019 
+
+#### Hours and Tasks (4.5 hrs)
+
+* 1-2pm Restructuring project documentation, publishing code on [github](https://github.com/phillipdavidstearns/auerbach-membrane)
+* 4-5pm Setting up calibration code
+* 11:30pm-1pm Writing calibration code
+
 ### March 27th 2019
 
-#### Hours and Tasks
+#### Hours and Tasks (5.5 hrs)
 
 * 12-3pm Gathering and reviewing material on the Dual G2 board
 * 5:30-8pm Soldering Dual G2 board, Flashing Arduino, Testing Dual G2 with 1 Motor
@@ -93,7 +101,7 @@ Motor spins up and reverses. Code seems pretty straight forward. It's possible t
 
 ### March 22nd 2019
 
-#### Hours and Tasks:
+#### Hours and Tasks (2 hrs)
 
 * 1-2pm (1hr) Call
 * 2pm-3pm (1hr) Research pump and compatibility with Arduino shield.
