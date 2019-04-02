@@ -25,7 +25,36 @@ DualG2HighPowerMotorShield18v22 md;
 #define P1_INC_BUTTON A4
 #define P1_DEC_BUTTON A5
 
+// Button Matrix Test Code
+// Used for quickly setting up a button interface with
+// 4x4 button matrix TS-792 from Tinkersphere.com
 
+// pin definitions for button columns
+#define BUTTON_COL_0 22
+#define BUTTON_COL_1 23
+#define BUTTON_COL_2 24
+#define BUTTON_COL_3 25
+
+// pin difinitions for button rows
+#define BUTTON_ROW_0 26
+#define BUTTON_ROW_1 27
+#define BUTTON_ROW_2 28
+#define BUTTON_ROW_3 29
+
+boolean debug = true;
+
+const int buttonRows = 4;
+const int buttonCols = 4;
+boolean buttonStates[buttonRows][buttonCols];
+boolean lastButtonStates[buttonRows][buttonCols];
+
+// variables for timing of the scan vs display of status
+unsigned long buttonScanInterval = 33;
+unsigned long printButtonInterval = 1000;
+unsigned long lastButtonScan = 0;
+unsigned long lastButtonPrint = 0;
+
+// refresh varaibles
 unsigned long frames = 0;
 unsigned long seconds = 0;
 unsigned long lastTime = 0;
@@ -44,12 +73,12 @@ volatile int m2Position = 0;
 const int buttonThreshold = 512;
 const int qtyButtons = 6;
 int buttonPins[qtyButtons] = { M1_INC_BUTTON, M1_DEC_BUTTON, M2_INC_BUTTON, M2_DEC_BUTTON, P1_INC_BUTTON, P1_DEC_BUTTON, };
-boolean buttonStates[qtyButtons] = { false, false, false, false };
 unsigned long lastButtonTime[qtyButtons];
 unsigned long debounce = 125; // 125 ms debounce time
 
 int m1Speed = 0;
 int m2Speed = 0;
+
 
 //////////////////////////////////////////////////////////////////
 //
@@ -59,21 +88,21 @@ void scanEncoderPins() {
     volatile boolean pinState = digitalRead(encoderPins[i]);
     if (encoderStates[i] != pinState) {
       encoderStates[i] = pinState;
-      switch(i){
-      case 0:
-       if (m1Speed < 0){
-        m1Position--;
-       } else {
-        m1Position++;
-       }
-      break;
-      case 1:
-       if (m2Speed < 0){
-        m2Position--;
-       } else {
-        m2Position++;
-       }
-      break;
+      switch (i) {
+        case 0:
+          if (m1Speed < 0) {
+            m1Position--;
+          } else {
+            m1Position++;
+          }
+          break;
+        case 1:
+          if (m2Speed < 0) {
+            m2Position--;
+          } else {
+            m2Position++;
+          }
+          break;
       }
     }
   }
@@ -112,13 +141,23 @@ void callback() {
 
 void setup() {
 
-  pinMode(M1_ENC1_PIN, INPUT);
-  pinMode(M1_ENC2_PIN, INPUT);
-  pinMode(M2_ENC1_PIN, INPUT);
-  pinMode(M2_ENC2_PIN, INPUT);
+  // 4x4 Matrix
+  pinMode(BUTTON_COL_0, INPUT_PULLUP);
+  pinMode(BUTTON_COL_1, INPUT_PULLUP);
+  pinMode(BUTTON_COL_2, INPUT_PULLUP);
+  pinMode(BUTTON_COL_3, INPUT_PULLUP);
+  pinMode(BUTTON_ROW_0, OUTPUT);
+  pinMode(BUTTON_ROW_1, OUTPUT);
+  pinMode(BUTTON_ROW_2, OUTPUT);
+  pinMode(BUTTON_ROW_3, OUTPUT);
 
-  Timer1.initialize(1e6 / 30); // period in micro seconds (1x10^6 / frames per second)
-  Timer1.attachInterrupt(callback);
+  //  pinMode(M1_ENC1_PIN, INPUT);
+  //  pinMode(M1_ENC2_PIN, INPUT);
+  //  pinMode(M2_ENC1_PIN, INPUT);
+  //  pinMode(M2_ENC2_PIN, INPUT);
+
+  //  Timer1.initialize(1e6 / 30); // period in micro seconds (1x10^6 / frames per second)
+  //  Timer1.attachInterrupt(callback);
 
   Serial.begin(115200);
   delay(1);
@@ -135,22 +174,17 @@ void setup() {
 //
 
 void loop() {
-  currentTime = millis();
-  if (currentTime - lastTime >= refreshTime) {
-    checkButtons();
-    updateMotorSpeeds();
-    lastTime = currentTime;
-    frames++;
-    if (frames % 30 == 0){
-      Serial.print("Motor 1 Speed: ");
-      Serial.println(m1Speed);
-      Serial.print("Motor 1 Position: ");
-      Serial.println(m1Position);
-      Serial.print("Motor 2 Speed: ");
-      Serial.println(m2Speed);
-      Serial.print("Motor 2 Position: ");
-      Serial.println(m2Position);
-    }
+  readButtons();
+  frames++;
+  if (frames % 300 == 0) {
+    Serial.print("Motor 1 Speed: ");
+    Serial.println(m1Speed);
+    Serial.print("Motor 1 Position: ");
+    Serial.println(m1Position);
+    Serial.print("Motor 2 Speed: ");
+    Serial.println(m2Speed);
+    Serial.print("Motor 2 Position: ");
+    Serial.println(m2Position);
   }
 }
 
@@ -183,42 +217,27 @@ void stopM2OnFault() {
 
 }
 
-//////////////////////////////////////////////////////////////////
-// checkButtons()
-//
-// should act as a kind of "debounce" for using the analog pins an button inputs
-
-void checkButtons() {
-//  currentTime = millis();
-  for ( int i = 0 ; i < qtyButtons ; i++ ) {
-//    if (currentTime - lastButtonTime[i] > debounce) {
-      if (analogRead(buttonPins[i]) >= buttonThreshold && !buttonStates[i]) {
-        buttonStates[i] = true;
-      } else if (analogRead(buttonPins[i]) < buttonThreshold && buttonStates[i] ) {
-        buttonStates[i] = false;
-      }
-//    }
-  }
-
-}
 
 //////////////////////////////////////////////////////////////////
 // updateMotorSpeeds()
 //
 //
 
-void updateMotorSpeeds() {
+void updateMotorSpeeds(int _button) {
 
-  if (buttonStates[0] && !buttonStates[1]) {
-    m1Speed--;
-  } else if (!buttonStates[0] && buttonStates[1]) {
-    m1Speed++;
-  }
-
-  if (buttonStates[2] && !buttonStates[3]) {
-    m2Speed--;
-  } else if (!buttonStates[2] && buttonStates[3]) {
-    m2Speed++;
+  switch (_button) {
+    case 0:
+      m1Speed--;
+      break;
+    case 1:
+      m1Speed++;
+      break;
+    case 2:
+      m2Speed--;
+      break;
+    case 3:
+      m2Speed++;
+      break;
   }
 
   md.setM1Speed(m1Speed);

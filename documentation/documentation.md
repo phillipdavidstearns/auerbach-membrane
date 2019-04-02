@@ -24,15 +24,47 @@ An Arduino will be running code to control the speed of a peristaltic pump, and 
 4. [Peristaltic pump](https://www.amazon.com/gp/product/B071F46P44/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
 
 
-## Motor Control Resources
+## Motor & Control Resources
 
-### Dual G2
+### Dual G2 Controller
 
 * [Product Page](https://www.pololu.com/product/2517)
 * [Arduino Libraries](https://github.com/pololu/dual-g2-high-power-motor-shield)
 * [Product Guide](https://www.pololu.com/docs/0J72/all) - READ FIRST!
 
+### Pololu #2827 Gear Head
+
+* [Product Page](https://www.pololu.com/product/2827)
+* [Issues with MEGA Interrupts](https://forum.arduino.cc/index.php?topic=158434.0)
+
+### EZO PMP
+
+* [Product Page](https://www.atlas-scientific.com/product_pages/peristaltic/ezo-pmp-kit.html)
+* [Code for Arduino MEGA](www.atlas-scientific.com/_files/code/ino_files/arduino_mega_PMP_sample_code.zip)
+* [Code for Arduino UNO](https://www.atlas-scientific.com/_files/code/ino_files/arduino_UNO_PMP_sample_code.zip)
+
 ## Hours, Tasks, Notes:
+
+### April 2nd 2019 (5 hrs)
+
+* 1-6pm
+	* Test EZO-PMP with Arduino MEGA - check
+	* Test DUAL G2 with Arduino MEGA - Works
+	* Test buttons - Wrote code to use a 4x4 button matrix as input
+	* Test speed calibration - Buttons increment speed and display to monitor
+
+**To Do:** write easing code, write code for and test encoder readability using interrupts.
+
+### March 31st 2019 (2 hrs)
+
+* 4-6pm Downloading and reviewing pump code for UNO and MEGA, Researching potential issues with reading the encoder input from the two gear head motors.
+
+### March 29th 2019
+
+#### Hours and Tasks (2 hrs)
+
+* 10-11am Writing calibration code
+* 4:30-5:30 Writing calibration code 
 
 ### March 28th 2019 
 
@@ -40,7 +72,7 @@ An Arduino will be running code to control the speed of a peristaltic pump, and 
 
 * 1-2pm Restructuring project documentation, publishing code on [github](https://github.com/phillipdavidstearns/auerbach-membrane)
 * 4-5pm Setting up calibration code
-* 11:30pm-1pm Writing calibration code
+* 11:30pm-1am Writing calibration code
 
 ### March 27th 2019
 
