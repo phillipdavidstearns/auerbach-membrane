@@ -58,6 +58,35 @@ An Arduino will be running code to control the speed of a peristaltic pump, and 
 
 ## Hours, Tasks, Notes:
 
+### April 7th 2019 (1 Day)
+
+* Installation day!
+* Code improvements:
+	* State machine cycles through the runtime routine:
+		* STARTUP
+		* OPEN
+		* HOLD_OPEN
+		* CLOSE
+		* HOLD_CLOSED
+	* Buttons reprogrammed to have two menus:
+		* CALIBRATE
+		* RUNTIME
+	* Better dampening and oscillation prevention
+	* Cutoff power based on speed and minimum power settings to prevent motor whine when in stationary positions.
+* Had to lengthen the ribbon cable in order to locate the motion control circuitry to one side for accessibility. The initial attempt reduced power to the second motor. Fixed with a dedicated 20 AWG power cable. Consider upgrading power runs to 18AWG
+* Setup solar charging system:
+	1. Panel connects to WANDERER charge controller
+	2. WANDERER charge controller connects to battery
+	3. A second charge controller with regulated and protected output connects to battery
+	4. Installation powered off the second charge controller
+
+### April 5th 2019 (3 Hours)
+
+* Successfully tested updated motion control code.
+* Setup a calibration mode to fine tune motor positions and determine ideal hard coded values.
+* Spent a bit of time tweaking to account for overshoot and oscillation.
+* Picked up a motor speed controller to test alternate pumps.
+
 ### April 4th 2019 (1 Day)
 
 * 10-11am Working on speed control for motors
