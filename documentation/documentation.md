@@ -43,7 +43,69 @@ An Arduino will be running code to control the speed of a peristaltic pump, and 
 * [Code for Arduino MEGA](www.atlas-scientific.com/_files/code/ino_files/arduino_mega_PMP_sample_code.zip)
 * [Code for Arduino UNO](https://www.atlas-scientific.com/_files/code/ino_files/arduino_UNO_PMP_sample_code.zip)
 
+### Stepper Motors
+
+* [tic controller board](https://www.pololu.com/product/3138)
+* [Stepper Candidate 1](https://www.pololu.com/product/1472) - Has 125 oz/in holding torque. Current within range of tic controllers.
+* [Arduino Shield by Adafruit](https://www.adafruit.com/product/1438)
+* [Adafruit Stepper is too small](https://cdn-shop.adafruit.com/product-files/324/C140-A+datasheet.jpg)
+
+## Solar
+
+### Shopping List:
+
+
+
 ## Hours, Tasks, Notes:
+
+### April 4th 2019 (1 Day)
+
+* 10-11am Working on speed control for motors
+* 3-4pm Setup EZO-PMP pump for testing @ Studio TA
+* 6p-1a Trying different solutions for setting motor position, limiting speed, using encoder feedback
+	* Started with a simple, move motor until target reached approach. The resulted in overshot, correcting caused oscillation.
+	* Attempted a PID approach to setting position
+	* Opted to make power directly related to the distance from current motor position and target position, limiting the power. Synchronization issues unresolved.
+	* Rather than specifying a target position once, specify target positions at short intervals ~10-20ms, making the movement between smooth. This solved the synchronization issue while simultaneously allowing for lower speeds without the torque limitations of simply setting a minimum power. The controller will set what ever power it needs, up to a limit, in order to reach it's target. If the position lags behind too much, more power is applied.
+
+### April 3rd 2019 (1 Day)
+
+* 11a meetup at Studio TA
+* 8pm Leave for the day
+* Tested EZO-PMP in place
+	* start with 8 ml/min
+	* in position, wrote code to startup and start pumping
+	* not satisfied with dosing characteristics. looking for smoother movement, this pump doses in spurts 
+	* Bought and tested a 2A DC Motor Speed Controller with a backup pump
+	* Plan B pumps on order
+* Tested Gear Head Motors attached to rollers
+	* Slow speeds can't handle torque
+	* Encoders are working and reading position reliably
+	* Need to set position and speed, use encoders to set power
+		* limit power and time, set fault mode
+
+#### Shopping List:
+
+* purchased: multi conductor cable - 6 conductor 20AWG stranded
+* purchased: header style connectors
+* on order: stepper motors with high hold torque
+* on order: charge controllers
+	* [Amazon Recommended](https://www.amazon.com/GHB-Controller-Intelligent-Temperature-Compensation/dp/B01LZZMDSQ/)
+	* [Nicer Looking, good reviews](https://www.amazon.com/HQST-Negative-Ground-Controller-Battery-Regulator/dp/B07BK24B75)
+
+#### Solar
+
+* 50AHr Battery
+* 100 Watt Panel
+* Projected Power Consumption. Assumptions:
+	* Installation will run 8 hours per day for 80 days
+	* Motors will consume 1 amp for 20 secs twice per minute
+	* 20 s x 2 x 60 mins x 8 hrs x 80 days / 3600 = 425 hours active during entire exhibition
+	* 425 hours @ 1 amp = 425 AHrs for the entire exhibition
+	* 8 hours * 20 s /60 s = 5.333 Hours active per day = 5.3 AHrs consumed
+	* 5.3 AHrs * 12 Volts = 64 WHrs
+	* The solar panel must produce 64 WHrs per day to replenish charge
+	* The installation can run about 8 days without needing to be recharges
 
 ### April 2nd 2019 (5 hrs)
 
