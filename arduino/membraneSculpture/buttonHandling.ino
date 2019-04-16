@@ -1,4 +1,21 @@
 //////////////////////////////////////////////////////////////////
+// initButtons()
+//
+
+void initButtons() {
+  // 4x4 MATRIX SETUP
+
+  pinMode(BUTTON_COL_0, INPUT_PULLUP);
+  pinMode(BUTTON_COL_1, INPUT_PULLUP);
+  pinMode(BUTTON_COL_2, INPUT_PULLUP);
+  pinMode(BUTTON_COL_3, INPUT_PULLUP);
+  pinMode(BUTTON_ROW_0, OUTPUT);
+  pinMode(BUTTON_ROW_1, OUTPUT);
+  pinMode(BUTTON_ROW_2, OUTPUT);
+  pinMode(BUTTON_ROW_3, OUTPUT);
+}
+
+//////////////////////////////////////////////////////////////////
 // readButtons()
 //
 
@@ -6,6 +23,7 @@ int readButtons() {
   int button = -1;
   for (int row = 0 ; row < buttonRows ; row++) {
 
+    // set the row pin low
     digitalWrite(BUTTON_ROW_0, row != 0);
     digitalWrite(BUTTON_ROW_1, row != 1);
     digitalWrite(BUTTON_ROW_2, row != 2);
@@ -14,31 +32,14 @@ int readButtons() {
     for (int col = 0 ; col < buttonCols ; col++) {
       buttonStates[col][row] = !boolean(digitalRead(BUTTON_COL_0 + col));
 
+      // if the button was off but now is on, set button to the number corresponding to it
       if (buttonStates[col][row] && !lastButtonStates[col][row]) {
         button =  col + row * buttonRows;
       }
 
+      // store the current state of the buttons for comparision next time around
       lastButtonStates[col][row] = buttonStates[col][row];
 
-    }
-  }
-  return button;
-}
-
-//////////////////////////////////////////////////////////////////
-// readButtons()
-//
-
-int whichButtonPressed() {
-  int button = -1;
-  for (int row = 0 ; row < buttonRows ; row++) {
-    for (int col = 0 ; col < buttonCols ; col++) {
-
-      if (buttonStates[col][row] && !lastButtonStates[col][row]) {
-        button =  col + row * buttonRows;
-      }
-
-      lastButtonStates[col][row] = buttonStates[col][row];
     }
   }
   return button;
@@ -151,6 +152,7 @@ void clearPositionFlags() {
 //////////////////////////////////////////////////////////////////
 // printButtonStates()
 //
+// not used. just here for diagnostics
 
 void printButtonStates() {
   Serial.print("Button States: \n");

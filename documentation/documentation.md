@@ -58,6 +58,19 @@ An Arduino will be running code to control the speed of a peristaltic pump, and 
 
 ## Hours, Tasks, Notes:
 
+### April 12th 2019 (1 Day)
+
+* Assembled and installed solar panels
+* Ran and secured cables for the solar system
+* Swapped out motors (partial de installation of the power)
+* Fine tuning of tension and timing
+
+### April 10th 2019 (1 Day)
+
+* Devised wiring plan for new solar charging configuration.
+* Put together a shopping for new solar charging configuration.
+* Met up @ AI to do some calibration of the timing.
+
 ### April 7th 2019 (1 Day)
 
 * Installation day!

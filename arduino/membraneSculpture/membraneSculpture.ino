@@ -28,10 +28,10 @@ unsigned long holdOpenStart = 0;
 unsigned long holdOpenEnd = 15000; // duration to hold open in ms
 
 unsigned long holdClosedStart = 0;
-unsigned long holdClosedEnd = 15000; // duration to hold open in ms
+unsigned long holdClosedEnd = 27500; // duration to hold open in ms
 
 unsigned long startupStart = 0;
-unsigned long startupEnd = 30000; // duration to hold open in ms
+unsigned long startupEnd = 20000; // duration to hold open in ms
 
 // Interrupt Pins for Gear Head Motors
 
@@ -77,7 +77,7 @@ unsigned long moveInterval = 10; // ms between position updates
 
 // Position Variables
 
-const int initTargetOpen = 3200;
+const int initTargetOpen = 2550;
 const int initTargetClose = 0;
 int initPosInc = 3;
 int posInc = initPosInc;
@@ -104,13 +104,11 @@ float m2Speed = 0; // in rev/s
 float powerScalar = 3;
 float powerEasing = 1.0;
 int targetWindow = 25; // +/- window for movement cutoff
+int powerLimit = 500; // +/- maximum power sent to motors
 float powerCutoff = 50; // +/- window for power cutoff
 float speedCutoff = 0.01; // +/- window for speed cutoff
-float powerDampening = .9;
 float m1Power = 0;
 float m2Power = 0;
-float m1PowerBoost = 0.125;
-float m2PowerBoost = 0.125;
 
 // EZO-PMP variables
 float startupFlow = 50;                                       // initial ml/min rate of fluid flow
@@ -127,73 +125,11 @@ float ml;                                             //used to hold a floating 
 
 void setup() {
 
-  // TimerOne Setup
-  // for regular sampling of speed
-  Timer1.initialize(1e5); // period in micro seconds (1e5 = 100ms)
-  Timer1.attachInterrupt(calcMotorSpeeds);
+  initButtons();
 
-  // Establish Serial Communication with Arduino
+  initMotionControl();
 
-  Serial.begin(115200);
-  Serial.print("\nMembrane Sculpture\nBy Tauba Auerbach\nCode by Phillip David Stearns\n");
-  Serial.println("Initializing...");
-
-  // 4x4 MATRIX SETUP
-
-  pinMode(BUTTON_COL_0, INPUT_PULLUP);
-  pinMode(BUTTON_COL_1, INPUT_PULLUP);
-  pinMode(BUTTON_COL_2, INPUT_PULLUP);
-  pinMode(BUTTON_COL_3, INPUT_PULLUP);
-  pinMode(BUTTON_ROW_0, OUTPUT);
-  pinMode(BUTTON_ROW_1, OUTPUT);
-  pinMode(BUTTON_ROW_2, OUTPUT);
-  pinMode(BUTTON_ROW_3, OUTPUT);
-
-  // DUAL G2 SETUP
-
-  // Interrupt Pins
-  pinMode(M1_ENC1_PIN, INPUT_PULLUP);
-  pinMode(M1_ENC2_PIN, INPUT_PULLUP);
-  pinMode(M2_ENC1_PIN, INPUT_PULLUP);
-  pinMode(M2_ENC2_PIN, INPUT_PULLUP);
-
-  // Attaching Interrupt Pins to ISR functions to counter encoder changes
-  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
-  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
-
-  Serial.println("Dual G2 High Power Motor Shield");
-  md.init();
-  md.calibrateCurrentOffsets();
-  delay(1000);
-
-  // Uncomment to flip a motor's direction:
-  // md.flipM1(true);
-  md.flipM2(true);
-
-  // EZO-PMP SETUP
-
-  Serial3.begin(115200);                              //set baud rate for software serial port_3
-  inputstring.reserve(32);                            //set aside some bytes for receiving data from the PC
-  devicestring.reserve(64);                           //set aside some bytes for receiving data from Atlas Scientific product
-  delay(100);
-
-  Serial.print("EZO-PMP\n");
-  Serial3.print("status\r");
-  delay(100);
-
-  Serial.print("Clearing volume pumped.\n");
-  Serial3.print("clear\r");
-  delay(100);
-
-  Serial.print("Continuous Mode without Reporting.\n");
-  Serial3.print("c,0\r");
-  delay(100);
-
-//  Serial.print("Setting pump rate to ");
-//  Serial.print(startupFlow);
-//  Serial.print(" ml/min \n");
-//  setFlowRate(startupFlow);
-//  delay(100);
+// initPump();
   
   startupStart = millis();
 }
