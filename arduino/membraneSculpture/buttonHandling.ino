@@ -13,6 +13,7 @@ void initButtons() {
   pinMode(BUTTON_ROW_1, OUTPUT);
   pinMode(BUTTON_ROW_2, OUTPUT);
   pinMode(BUTTON_ROW_3, OUTPUT);
+  
 }
 
 //////////////////////////////////////////////////////////////////
@@ -102,15 +103,15 @@ void executeButtonAction(int _button) {
         break;
 
       case 12: // pump rate = startupFlow
-        setFlowRate(startupFlow);
+//        setFlowRate(startupFlow);
         break;
 
       case 13: // pump rate = runFlow
-        setFlowRate(runFlow);
+//        setFlowRate(runFlow);
         break;
 
       case 14: // pause / resume pump
-        pausePump();
+//        pausePump();
         break;
 
       case 15: //
@@ -131,7 +132,7 @@ void executeButtonAction(int _button) {
 
       case 2: // BUTTON 03 - set state to Startup
         machineState = STARTUP;
-        setFlowRate(startupFlow);
+//        setFlowRate(startupFlow);
         clearPositionFlags();
         break;
 

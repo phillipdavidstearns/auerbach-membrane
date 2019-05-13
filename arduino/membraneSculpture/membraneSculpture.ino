@@ -75,6 +75,8 @@ unsigned long statusInterval = 1000; // ms between status update
 unsigned long lastMove = 0;
 unsigned long moveInterval = 10; // ms between position updates
 
+unsigned long currentTime = 0;
+
 // Position Variables
 
 const int initTargetOpen = 2550;
@@ -112,7 +114,7 @@ float m2Power = 0;
 
 // EZO-PMP variables
 float startupFlow = 50;                                       // initial ml/min rate of fluid flow
-float runFlow = 8; 
+float runFlow = 8;
 String inputstring = "";                              //a string to hold incoming data from the PC
 String devicestring = "";                             //a string to hold the data from the Atlas Scientific product
 boolean device_string_complete = false;               //have we received all the data from the PC
@@ -129,8 +131,8 @@ void setup() {
 
   initMotionControl();
 
-// initPump();
-  
+  // initPump();
+
   startupStart = millis();
 }
 
@@ -139,23 +141,23 @@ void setup() {
 
 void loop() {
 
-  unsigned long currentTime = millis();
+  currentTime = millis();
 
-  pumpCommunication();
+//  pumpCommunication();
 
   if (machineState != CALIBRATE) stateMachine();
 
-  if (currentTime - lastButtonScan >= buttonInterval) {
+  if ( (unsigned long) (currentTime - lastButtonScan) >= buttonInterval) {
     executeButtonAction(readButtons());
     lastButtonScan = currentTime;
   }
 
-  if (moveMotors && (currentTime - lastMove >= moveInterval)) {
+  if (moveMotors && ( (unsigned long) (currentTime - lastMove) >= moveInterval)) {
     moveToTarget(target);
     lastMove = currentTime;
   }
 
-  if (debug && (currentTime - lastTime >= statusInterval)) {
+  if (debug && ( (unsigned long) (currentTime - lastTime) >= statusInterval)) {
     verboseOutput();
     lastTime = currentTime;
   }

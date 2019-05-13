@@ -1,18 +1,18 @@
 //// KEYWORDS FOR STATE MACHINE
 //
-//#define CALIBRATE   0 
-//#define OPEN        1 
-//#define HOLD_OPEN   2 
-//#define CLOSE       3 
-//#define HOLD_CLOSE  4 
-//#define STARTUP     5 
+//#define CALIBRATE   0
+//#define OPEN        1
+//#define HOLD_OPEN   2
+//#define CLOSE       3
+//#define HOLD_CLOSE  4
+//#define STARTUP     5
 //
 //boolean isOpen;
 //boolean isClosed;
 
 void stateMachine() {
 
-  unsigned long currentTime = millis();
+  currentTime = millis();
 
   switch (machineState) {
 
@@ -30,7 +30,7 @@ void stateMachine() {
       break;
 
     case HOLD_OPEN: // holding open
-      if (currentTime - holdOpenStart > holdOpenEnd) {
+      if ( (unsigned long) (currentTime - holdOpenStart) > holdOpenEnd) {
         target = targetClosed;
         machineState = CLOSE;
         clearPositionFlags();
@@ -50,7 +50,7 @@ void stateMachine() {
       break;
 
     case HOLD_CLOSED: // holding closed
-      if (currentTime - holdClosedStart > holdClosedEnd) {
+      if ( (unsigned long) (currentTime - holdClosedStart) > holdClosedEnd) {
         target = targetOpen;
         machineState = OPEN;
         clearPositionFlags();
@@ -61,12 +61,12 @@ void stateMachine() {
 
     case 5: // startup
 
-        if (currentTime - startupStart > startupEnd) {
-          setFlowRate(runFlow);
-          machineState = OPEN;
-          clearPositionFlags();
-        }
-       
+      if ( (unsigned long) (currentTime - startupStart) > startupEnd) {
+//        setFlowRate(runFlow);
+        machineState = OPEN;
+        clearPositionFlags();
+      }
+
       break;
   }
 }

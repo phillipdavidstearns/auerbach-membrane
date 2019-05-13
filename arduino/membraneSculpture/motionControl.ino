@@ -86,15 +86,17 @@ void moveToTarget(int _target) {
       isClosed = true;
     }
   }
-
-  m1Power = ease(m1Power, constrain(powerScalar * (m1NextPos - m1PosComp), -powerLimit, powerLimit), powerEasing);
+  
+  m1Power += ease(m1Power, powerScalar * (m1NextPos - m1PosComp), powerEasing);
+  m1Power = constrain(m1Power, -powerLimit, powerLimit);
   if ((abs(m1Power) < powerCutoff) && (abs(m1Speed) < speedCutoff) ) {
     m1Power = 0;
   }
   md.setM1Speed(m1Power);
   stopM1OnFault();
 
-  m2Power = ease(m2Power, constrain(powerScalar * (m2NextPos - m2PosComp), -powerLimit, powerLimit), powerEasing);
+  m2Power += ease(m2Power, powerScalar * (m2NextPos - m2PosComp), powerEasing);
+  m2Power = constrain(m2Power , -powerLimit, powerLimit);
   if ((abs(m2Power) < powerCutoff) && (abs(m2Speed) < speedCutoff) ) {
     m2Power = 0;
   }
@@ -124,7 +126,8 @@ void stopM1OnFault() {
   if (md.getM1Fault()) {
     md.disableDrivers();
     delay(1);
-    Serial.println("M1 fault");
+    Serial.print("M1 fault. Time:");
+    Serial.println(millis());
     while (1);
   }
 }
@@ -133,7 +136,8 @@ void stopM2OnFault() {
   if (md.getM2Fault()) {
     md.disableDrivers();
     delay(1);
-    Serial.println("M2 fault");
+    Serial.print("M2 fault. Time:");
+    Serial.println(millis());
     while (1);
   }
 }
