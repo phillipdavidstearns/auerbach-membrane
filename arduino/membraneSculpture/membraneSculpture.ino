@@ -3,7 +3,7 @@
 */
 
 // Libraries
-#include <TimerOne.h> // including the TimerOne library for getting accurate speed readings
+//#include <TimerOne.h> // including the TimerOne library for getting accurate speed readings
 #include <DualG2HighPowerMotorShield.h>
 
 // DualG2 Board Object
