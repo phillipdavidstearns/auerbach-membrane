@@ -3,7 +3,7 @@
 */
 
 // Libraries
-//#include <TimerOne.h> // including the TimerOne library for getting accurate speed readings
+#include <TimerOne.h> // including the TimerOne library for getting accurate speed readings
 #include <DualG2HighPowerMotorShield.h>
 
 // DualG2 Board Object
@@ -24,14 +24,17 @@ int lastMachineState = CLOSE;
 boolean isOpen = false;
 boolean isClosed = false;
 
+unsigned long openDuration = 15000; // the amount of time the movement should take
+unsigned long closeDuration = 12500; // the amount of time the movement should take
+
 unsigned long holdOpenStart = 0;
 unsigned long holdOpenEnd = 15000; // duration to hold open in ms
 
 unsigned long holdClosedStart = 0;
-unsigned long holdClosedEnd = 27500; // duration to hold open in ms
+unsigned long holdClosedEnd = 17500; // duration to hold open in ms
 
 unsigned long startupStart = 0;
-unsigned long startupEnd = 20000; // duration to hold open in ms
+unsigned long startupEnd = 35000; // duration to hold open in ms
 
 // Interrupt Pins for Gear Head Motors
 
@@ -66,6 +69,8 @@ boolean buttonStates[buttonRows][buttonCols];
 boolean lastButtonStates[buttonRows][buttonCols];
 
 // variables for timing
+unsigned long currentTime = 0;
+
 unsigned long buttonInterval = 100; // ms between button polls
 unsigned long lastButtonScan = 0;
 
@@ -75,10 +80,8 @@ unsigned long statusInterval = 1000; // ms between status update
 unsigned long lastMove = 0;
 unsigned long moveInterval = 10; // ms between position updates
 
-unsigned long currentTime = 0;
 
 // Position Variables
-
 const int initTargetOpen = 2550;
 const int initTargetClose = 0;
 int initPosInc = 3;
@@ -105,9 +108,9 @@ float m2Speed = 0; // in rev/s
 // Power Variables
 float powerScalar = 3;
 float powerEasing = 1.0;
-int targetWindow = 25; // +/- window for movement cutoff
+int targetWindow = 5; // +/- window for movement cutoff
 int powerLimit = 500; // +/- maximum power sent to motors
-float powerCutoff = 50; // +/- window for power cutoff
+float powerCutoff = 75; // +/- window for power cutoff
 float speedCutoff = 0.01; // +/- window for speed cutoff
 float m1Power = 0;
 float m2Power = 0;
@@ -121,6 +124,18 @@ boolean device_string_complete = false;               //have we received all the
 boolean sensor_string_complete = false;               //have we received all the data from the Atlas Scientific product
 float ml;                                             //used to hold a floating point number that is the volume
 
+unsigned long ti = 0; // initial time when movement was started
+unsigned long dT = 1; // the amount of time the movement should take
+unsigned long tf = 0; // the time relative to initial time that the movement should complete
+unsigned long tc = 0; // the current time
+float tp = float(tc - ti) / float(dT); // the amount of progress %
+float sigmoid1 = 0;
+float sigmoid2 = 0;
+float sigmoid3 = 0;
+// fun smoothing functions;
+//sigmoid1 = 1 / ( 1 + pow(M_E, -(12 * tp - 6))); // natural log 
+//sigmoid2 = 0.5 * tanh((2 * PI * tp) - PI) + 0.5; // hyperbolic tan
+//sigmoid3 = pow(sin(0.5 * PI * tp), 2); // sine squared
 
 //////////////////////////////////////////////////////////////////
 // setup()
@@ -143,21 +158,21 @@ void loop() {
 
   currentTime = millis();
 
-//  pumpCommunication();
+  //  pumpCommunication();
 
   if (machineState != CALIBRATE) stateMachine();
 
-  if ( (unsigned long) (currentTime - lastButtonScan) >= buttonInterval) {
+  if ( (currentTime - lastButtonScan) >= buttonInterval) {
     executeButtonAction(readButtons());
     lastButtonScan = currentTime;
   }
 
-  if (moveMotors && ( (unsigned long) (currentTime - lastMove) >= moveInterval)) {
+  if (moveMotors /*&& ( (currentTime - lastMove) >= moveInterval)*/) {
     moveToTarget(target);
-    lastMove = currentTime;
+    //    lastMove = currentTime;
   }
 
-  if (debug && ( (unsigned long) (currentTime - lastTime) >= statusInterval)) {
+  if (debug && ( (currentTime - lastTime) >= statusInterval)) {
     verboseOutput();
     lastTime = currentTime;
   }

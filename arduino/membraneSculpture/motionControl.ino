@@ -34,7 +34,7 @@ void initMotionControl() {
   delay(1000);
 
   // Uncomment to flip a motor's direction:
-  // md.flipM1(true);
+  //md.flipM1(true);
   md.flipM2(true);
 }
 
@@ -51,52 +51,20 @@ void moveToTarget(int _target) {
   float m1Distance = _target - m1PosComp;
   float m2Distance = _target - m2PosComp;
 
-  // check to see if the distance is outside of the target window
-  if (m1Distance > targetWindow ) {
-    if (m1PosComp < _target) {
-      m1NextPos += posInc;
-    }
-  } else if (m1Distance < -targetWindow) {
-    if (m1PosComp > _target) {
-      m1NextPos -= posInc;
-    }
-  } else { // set power to 0 and set flag to indicate arrival
-    m1Power = 0;
-    if (machineState == OPEN) {
-      isOpen = true;
-    } else if (machineState == CLOSE) {
-      isClosed = true;
-    }
-  }
-
-  // check to see if the distance is outside of the target window
-  if (m2Distance > targetWindow) {
-    if (m2PosComp < _target) {
-      m2NextPos += posInc;
-    }
-  } else if ( m2Distance < -targetWindow) {
-    if (m2PosComp > _target) {
-      m2NextPos -= posInc;
-    }
-  } else {
-    m2Power = 0;
-    if (machineState == OPEN) {
-      isOpen = true;
-    } else if (machineState == CLOSE) {
-      isClosed = true;
-    }
-  }
-  
-  m1Power += ease(m1Power, powerScalar * (m1NextPos - m1PosComp), powerEasing);
+  m1Power += ease(m1Power, powerScalar * (_target - m1PosComp), powerEasing);
+  //  m1Power = powerScalar * (_target - m1PosComp);
   m1Power = constrain(m1Power, -powerLimit, powerLimit);
+//  if(isClosed || isOpen){
   if ((abs(m1Power) < powerCutoff) && (abs(m1Speed) < speedCutoff) ) {
     m1Power = 0;
   }
   md.setM1Speed(m1Power);
   stopM1OnFault();
 
-  m2Power += ease(m2Power, powerScalar * (m2NextPos - m2PosComp), powerEasing);
-  m2Power = constrain(m2Power , -powerLimit, powerLimit);
+  m2Power += ease(m2Power, powerScalar * (_target - m2PosComp), powerEasing);
+  //  m2Power = powerScalar * (_target - m2PosComp);
+  m2Power = constrain(m2Power, -powerLimit, powerLimit);
+//  if(isClosed || isOpen){
   if ((abs(m2Power) < powerCutoff) && (abs(m2Speed) < speedCutoff) ) {
     m2Power = 0;
   }

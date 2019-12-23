@@ -13,7 +13,7 @@ void initButtons() {
   pinMode(BUTTON_ROW_1, OUTPUT);
   pinMode(BUTTON_ROW_2, OUTPUT);
   pinMode(BUTTON_ROW_3, OUTPUT);
-  
+
 }
 
 //////////////////////////////////////////////////////////////////
@@ -87,11 +87,11 @@ void executeButtonAction(int _button) {
         break;
 
       case 8: // increase speed
-        target = targetOpen;
+        //target = targetOpen;
         break;
 
       case 9: // decrease speed
-        target = targetClosed;
+        //target = targetClosed;
         break;
 
       case 10: // reset speed
@@ -103,15 +103,15 @@ void executeButtonAction(int _button) {
         break;
 
       case 12: // pump rate = startupFlow
-//        setFlowRate(startupFlow);
+        //        setFlowRate(startupFlow);
         break;
 
       case 13: // pump rate = runFlow
-//        setFlowRate(runFlow);
+        //        setFlowRate(runFlow);
         break;
 
       case 14: // pause / resume pump
-//        pausePump();
+        //        pausePump();
         break;
 
       case 15: //
@@ -121,18 +121,28 @@ void executeButtonAction(int _button) {
   } else { // otherwise the machine is in run mode and has these functions
     switch (_button) {
       case 0: // BUTTON 01 - set state to Open
+        currentTime = millis();
+        ti = currentTime;
+        dT = 5000;
+        tf = ti + dT;
+        tp = 0;
         machineState = OPEN;
         clearPositionFlags();
         break;
 
       case 1:  // BUTTON 02 - set state to Close
+        currentTime = millis();
+        ti = currentTime;
+        dT = 5000;
+        tf = ti + dT;
+        tp = 0;
         machineState = CLOSE;
         clearPositionFlags();
         break;
 
       case 2: // BUTTON 03 - set state to Startup
         machineState = STARTUP;
-//        setFlowRate(startupFlow);
+        //        setFlowRate(startupFlow);
         clearPositionFlags();
         break;
 
@@ -143,11 +153,6 @@ void executeButtonAction(int _button) {
         break;
     }
   }
-}
-
-void clearPositionFlags() {
-  isOpen = false;
-  isClosed = false;
 }
 
 //////////////////////////////////////////////////////////////////

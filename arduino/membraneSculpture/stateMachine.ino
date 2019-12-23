@@ -20,10 +20,14 @@ void stateMachine() {
       break;
 
     case OPEN: // open
+      if (currentTime >= tf) {
+        isOpen = true;
+      }
       if (isOpen) {
         machineState = HOLD_OPEN;
       } else {
-        target = targetOpen;
+        tp = float(currentTime - ti) / float(dT);
+        target = int(pow(sin(0.5 * PI * tp), 2) * float(targetOpen - targetClosed));
         holdOpenStart = currentTime;
         clearPositionFlags();
       }
@@ -31,7 +35,12 @@ void stateMachine() {
 
     case HOLD_OPEN: // holding open
       if ( (unsigned long) (currentTime - holdOpenStart) > holdOpenEnd) {
-        target = targetClosed;
+        
+        ti = currentTime;
+        dT = closeDuration;
+        tf = ti + dT;
+        tp = 0;
+        
         machineState = CLOSE;
         clearPositionFlags();
       } else {
@@ -40,10 +49,15 @@ void stateMachine() {
       break;
 
     case CLOSE: // close
+      if (currentTime >= tf) {
+        isClosed = true;
+      }
       if (isClosed) {
         machineState = HOLD_CLOSED;
       } else {
-        target = targetClosed;
+        
+        tp = float(currentTime - ti) / float(dT);
+        target = int((1-pow(sin(0.5 * PI * tp), 2)) * float(targetOpen - targetClosed));
         holdClosedStart = currentTime;
         clearPositionFlags();
       }
@@ -51,7 +65,12 @@ void stateMachine() {
 
     case HOLD_CLOSED: // holding closed
       if ( (unsigned long) (currentTime - holdClosedStart) > holdClosedEnd) {
-        target = targetOpen;
+
+        ti = currentTime;
+        dT = openDuration;
+        tf = ti + dT;
+        tp = 0;
+
         machineState = OPEN;
         clearPositionFlags();
       } else {
@@ -62,11 +81,21 @@ void stateMachine() {
     case 5: // startup
 
       if ( (unsigned long) (currentTime - startupStart) > startupEnd) {
-//        setFlowRate(runFlow);
+        //        setFlowRate(runFlow);
+
+        ti = currentTime;
+        dT = openDuration;
+        tf = ti + dT;
+
         machineState = OPEN;
         clearPositionFlags();
       }
 
       break;
   }
+}
+
+void clearPositionFlags() {
+  isOpen = false;
+  isClosed = false;
 }
