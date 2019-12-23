@@ -138,48 +138,6 @@ float sigmoid3 = 0;
 //sigmoid3 = pow(sin(0.5 * PI * tp), 2); // sine squared
 
 //////////////////////////////////////////////////////////////////
-// setup()
-
-void setup() {
-
-  initButtons();
-
-  initMotionControl();
-
-  // initPump();
-
-  startupStart = millis();
-}
-
-//////////////////////////////////////////////////////////////////
-// loop()
-
-void loop() {
-
-  currentTime = millis();
-
-  //  pumpCommunication();
-
-  if (machineState != CALIBRATE) stateMachine();
-
-  if ( (currentTime - lastButtonScan) >= buttonInterval) {
-    executeButtonAction(readButtons());
-    lastButtonScan = currentTime;
-  }
-
-  if (moveMotors /*&& ( (currentTime - lastMove) >= moveInterval)*/) {
-    moveToTarget(target);
-    //    lastMove = currentTime;
-  }
-
-  if (debug && ( (currentTime - lastTime) >= statusInterval)) {
-    verboseOutput();
-    lastTime = currentTime;
-  }
-
-}
-
-//////////////////////////////////////////////////////////////////
 // ISRs
 //
 // encoder states are captured on interrupt pins
@@ -205,7 +163,6 @@ void m2Enc1() {
   } else {
     m2Pos--;
   }
-  
 }
 
 void calcMotorSpeeds(){
@@ -698,4 +655,46 @@ void stateMachine() {
 void clearPositionFlags() {
   isOpen = false;
   isClosed = false;
+}
+
+//////////////////////////////////////////////////////////////////
+// setup()
+
+void setup() {
+
+  initButtons();
+
+  initMotionControl();
+
+  // initPump();
+
+  startupStart = millis();
+}
+
+//////////////////////////////////////////////////////////////////
+// loop()
+
+void loop() {
+
+  currentTime = millis();
+
+  //  pumpCommunication();
+
+  if (machineState != CALIBRATE) stateMachine();
+
+  if ( (currentTime - lastButtonScan) >= buttonInterval) {
+    executeButtonAction(readButtons());
+    lastButtonScan = currentTime;
+  }
+
+  if (moveMotors /*&& ( (currentTime - lastMove) >= moveInterval)*/) {
+    moveToTarget(target);
+    //    lastMove = currentTime;
+  }
+
+  if (debug && ( (currentTime - lastTime) >= statusInterval)) {
+    verboseOutput();
+    lastTime = currentTime;
+  }
+
 }
