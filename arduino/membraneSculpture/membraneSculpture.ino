@@ -584,8 +584,10 @@ void setup() {
   delay(1000);
 
   // Attaching Interrupt Pins to ISR functions to counter encoder changes
-  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
-  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
+//  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
+//  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
+  attachInterrupt(M1_ENC1_PIN, m1Enc1, CHANGE); // connect encoder to pin 18
+  attachInterrupt(M2_ENC1_PIN, m2Enc1, CHANGE); // connect encoder to pin 20
 
   // Uncomment to flip a motor's direction:
   //md.flipM1(true);
