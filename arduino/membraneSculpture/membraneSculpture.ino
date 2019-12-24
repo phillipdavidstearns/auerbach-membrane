@@ -171,7 +171,13 @@ void calcMotorSpeeds(){
   m2Speed = stepAngle*(m2Pos - lastM2Pos)*10;
   lastM2Pos = m2Pos;
 }
-
+//////////////////////////////////////////////////////////////////
+// clearPositionFlags()
+//
+void clearPositionFlags() {
+  isOpen = false;
+  isClosed = false;
+}
 //////////////////////////////////////////////////////////////////
 // initButtons()
 //
@@ -355,37 +361,7 @@ void printButtonStates() {
 //  initMotionControl()
 
 void initMotionControl() {
-  // Establish Serial Communication with Arduino
-
-  Serial.begin(115200);
-  Serial.print("\nMembrane Sculpture\nBy Tauba Auerbach\nCode by Phillip David Stearns\n");
-  Serial.println("Initializing...");
-
-  // TimerOne Setup
-  // for regular sampling of speed
-  Timer1.initialize(1e5); // period in micro seconds (1e5 = 100ms)
-  Timer1.attachInterrupt(calcMotorSpeeds);
-
-  // DUAL G2 SETUP
-
-  // Interrupt Pins
-  pinMode(M1_ENC1_PIN, INPUT_PULLUP);
-  pinMode(M1_ENC2_PIN, INPUT_PULLUP);
-  pinMode(M2_ENC1_PIN, INPUT_PULLUP);
-  pinMode(M2_ENC2_PIN, INPUT_PULLUP);
-
-  Serial.println("Dual G2 High Power Motor Shield");
-  md.init();
-  md.calibrateCurrentOffsets();
-  delay(1000);
-
-  // Attaching Interrupt Pins to ISR functions to counter encoder changes
-  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
-  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
-
-  // Uncomment to flip a motor's direction:
-  //md.flipM1(true);
-  md.flipM2(true);
+  
 }
 //////////////////////////////////////////////////////////////////
 // stopIfFault()
@@ -493,13 +469,6 @@ void verboseOutput() {
 //boolean isOpen;
 //boolean isClosed;
 
-
-void clearPositionFlags() {
-  isOpen = false;
-  isClosed = false;
-}
-
-
 void stateMachine() {
 
   currentTime = millis();
@@ -589,7 +558,39 @@ void stateMachine() {
 
 void setup() {
   initButtons();
-  initMotionControl();
+  
+  // Establish Serial Communication with Arduino
+
+  Serial.begin(115200);
+  Serial.print("\nMembrane Sculpture\nBy Tauba Auerbach\nCode by Phillip David Stearns\n");
+  Serial.println("Initializing...");
+
+  // TimerOne Setup
+  // for regular sampling of speed
+  Timer1.initialize(1e5); // period in micro seconds (1e5 = 100ms)
+  Timer1.attachInterrupt(calcMotorSpeeds);
+
+  // DUAL G2 SETUP
+
+  // Interrupt Pins
+  pinMode(M1_ENC1_PIN, INPUT_PULLUP);
+  pinMode(M1_ENC2_PIN, INPUT_PULLUP);
+  pinMode(M2_ENC1_PIN, INPUT_PULLUP);
+  pinMode(M2_ENC2_PIN, INPUT_PULLUP);
+
+  Serial.println("Dual G2 High Power Motor Shield");
+  md.init();
+  md.calibrateCurrentOffsets();
+  delay(1000);
+
+  // Attaching Interrupt Pins to ISR functions to counter encoder changes
+  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
+  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
+
+  // Uncomment to flip a motor's direction:
+  //md.flipM1(true);
+  md.flipM2(true);
+  
   startupStart = millis();
 }
 
