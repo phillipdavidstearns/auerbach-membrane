@@ -374,14 +374,14 @@ void initMotionControl() {
   pinMode(M2_ENC1_PIN, INPUT_PULLUP);
   pinMode(M2_ENC2_PIN, INPUT_PULLUP);
 
-  // Attaching Interrupt Pins to ISR functions to counter encoder changes
-  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
-  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
-
   Serial.println("Dual G2 High Power Motor Shield");
   md.init();
   md.calibrateCurrentOffsets();
   delay(1000);
+
+  // Attaching Interrupt Pins to ISR functions to counter encoder changes
+  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
+  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
 
   // Uncomment to flip a motor's direction:
   //md.flipM1(true);
@@ -412,10 +412,6 @@ void stopM2OnFault() {
   }
 }
 
-void stopIfFault() {
-  stopM1OnFault();
-  stopM2OnFault();
-}
 //////////////////////////////////////////////////////////////////
 // ease()
 
@@ -457,6 +453,11 @@ void moveToTarget(int _target) {
 
 }
 
+void stopIfFault() {
+  stopM1OnFault();
+  stopM2OnFault();
+}
+
 void verboseOutput() {
   Serial.print("Machine State: ");
   Serial.print(machineState);
@@ -491,6 +492,13 @@ void verboseOutput() {
 //
 //boolean isOpen;
 //boolean isClosed;
+
+
+void clearPositionFlags() {
+  isOpen = false;
+  isClosed = false;
+}
+
 
 void stateMachine() {
 
@@ -576,12 +584,6 @@ void stateMachine() {
       break;
   }
 }
-
-void clearPositionFlags() {
-  isOpen = false;
-  isClosed = false;
-}
-
 //////////////////////////////////////////////////////////////////
 // setup()
 
