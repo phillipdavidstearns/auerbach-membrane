@@ -39,6 +39,13 @@ unsigned long startupEnd = 1000; // duration to hold open in ms (was 35000)
 // Interrupt Pins for Gear Head Motors
 
 // Motor 1
+#define M1_ENC1_IRQ_PIN 5 //18
+#define M1_ENC2_IRQ_PIN 4 //19
+
+// Motor 2
+#define M2_ENC1_IRQ_PIN 3 //20
+#define M2_ENC2_IRQ_PIN 2 //21
+
 #define M1_ENC1_PIN 18
 #define M1_ENC2_PIN 19
 
@@ -580,8 +587,8 @@ void setup() {
   // Attaching Interrupt Pins to ISR functions to counter encoder changes
   //  attachInterrupt(, m1Enc1, CHANGE); // connect encoder to pin 18
   //  attachInterrupt(, m2Enc1, CHANGE); // connect encoder to pin 20
-  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
-  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
+  attachInterrupt(M1_ENC1_IRQ_PIN, m1Enc1, CHANGE); // connect encoder to pin 18
+  attachInterrupt(M2_ENC1_IRQ_PIN, m2Enc1, CHANGE); // connect encoder to pin 20
 
   // Uncomment to flip a motor's direction:
   //md.flipM1(true);
