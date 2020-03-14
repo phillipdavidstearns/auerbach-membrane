@@ -34,7 +34,7 @@ unsigned long holdClosedStart = 0;
 unsigned long holdClosedEnd = 17500; // duration to hold open in ms
 
 unsigned long startupStart = 0;
-unsigned long startupEnd = 35000; // duration to hold open in ms
+unsigned long startupEnd = 1000; // duration to hold open in ms (was 35000)
 
 // Interrupt Pins for Gear Head Motors
 
@@ -107,10 +107,10 @@ float m2Speed = 0; // in rev/s
 
 // Power Variables
 float powerScalar = 3;
-float powerEasing = 1.0;
+float powerEasing = 0.85;
 int targetWindow = 5; // +/- window for movement cutoff
-int powerLimit = 500; // +/- maximum power sent to motors
-float powerCutoff = 75; // +/- window for power cutoff
+int powerLimit = 480; // +/- maximum power sent to motors
+float powerCutoff = 25; // +/- window for power cutoff
 float speedCutoff = 0.01; // +/- window for speed cutoff
 float m1Power = 0;
 float m2Power = 0;
@@ -133,7 +133,7 @@ float sigmoid1 = 0;
 float sigmoid2 = 0;
 float sigmoid3 = 0;
 // fun smoothing functions;
-//sigmoid1 = 1 / ( 1 + pow(M_E, -(12 * tp - 6))); // natural log 
+//sigmoid1 = 1 / ( 1 + pow(M_E, -(12 * tp - 6))); // natural log
 //sigmoid2 = 0.5 * tanh((2 * PI * tp) - PI) + 0.5; // hyperbolic tan
 //sigmoid3 = pow(sin(0.5 * PI * tp), 2); // sine squared
 
@@ -165,10 +165,10 @@ void m2Enc1() {
   }
 }
 
-void calcMotorSpeeds(){
-  m1Speed = stepAngle*(m1Pos - lastM1Pos)*10;
+void calcMotorSpeeds() {
+  m1Speed = stepAngle * (m1Pos - lastM1Pos) * 10;
   lastM1Pos = m1Pos;
-  m2Speed = stepAngle*(m2Pos - lastM2Pos)*10;
+  m2Speed = stepAngle * (m2Pos - lastM2Pos) * 10;
   lastM2Pos = m2Pos;
 }
 //////////////////////////////////////////////////////////////////
@@ -358,12 +358,6 @@ void printButtonStates() {
 // MOTION CONTROL FUNCTIONS
 //
 //////////////////////////////////////////////////////////////////
-//  initMotionControl()
-
-void initMotionControl() {
-  
-}
-//////////////////////////////////////////////////////////////////
 // stopIfFault()
 //
 // Check if there's something wrong. If so, stop running!
@@ -401,28 +395,28 @@ void moveToTarget(int _target) {
 
   // apply motor position offsets
   m1PosComp = m1Pos + m1PosOffset;
-  m2PosComp = m2Pos + m2PosOffset;
-
   // compute the distance between the current motor positions and their targets
   float m1Distance = _target - m1PosComp;
-  float m2Distance = _target - m2PosComp;
-
-  m1Power += ease(m1Power, powerScalar * (_target - m1PosComp), powerEasing);
-  //  m1Power = powerScalar * (_target - m1PosComp);
+  float m1force = -powerScalar * m1Distance;
+  m1Power += ease(m1Power, m1force, powerEasing);
   m1Power = constrain(m1Power, -powerLimit, powerLimit);
-//  if(isClosed || isOpen){
-  if ((abs(m1Power) < powerCutoff) && (abs(m1Speed) < speedCutoff) ) {
-    m1Power = 0;
+  if (isClosed || isOpen) {
+    if ((abs(m1Power) < powerCutoff) && (abs(m1Speed) < speedCutoff) ) {
+      m1Power = 0;
+    }
   }
   md.setM1Speed(m1Power);
   stopM1OnFault();
 
-  m2Power += ease(m2Power, powerScalar * (_target - m2PosComp), powerEasing);
-  //  m2Power = powerScalar * (_target - m2PosComp);
+  m2PosComp = m2Pos + m2PosOffset;
+  float m2Distance = _target - m2PosComp;
+  float m2Force  = -powerScalar * m2Distance;
+  m2Power += ease(m2Power, m2Force, powerEasing);
   m2Power = constrain(m2Power, -powerLimit, powerLimit);
-//  if(isClosed || isOpen){
-  if ((abs(m2Power) < powerCutoff) && (abs(m2Speed) < speedCutoff) ) {
-    m2Power = 0;
+  if (isClosed || isOpen) {
+    if ((abs(m2Power) < powerCutoff) && (abs(m2Speed) < speedCutoff) ) {
+      m2Power = 0;
+    }
   }
   md.setM2Speed(m2Power);
   stopM2OnFault();
@@ -494,12 +488,12 @@ void stateMachine() {
 
     case HOLD_OPEN: // holding open
       if ( (unsigned long) (currentTime - holdOpenStart) > holdOpenEnd) {
-        
+
         ti = currentTime;
         dT = closeDuration;
         tf = ti + dT;
         tp = 0;
-        
+
         machineState = CLOSE;
         clearPositionFlags();
       } else {
@@ -514,9 +508,9 @@ void stateMachine() {
       if (isClosed) {
         machineState = HOLD_CLOSED;
       } else {
-        
+
         tp = float(currentTime - ti) / float(dT);
-        target = int((1-pow(sin(0.5 * PI * tp), 2)) * float(targetOpen - targetClosed));
+        target = int((1 - pow(sin(0.5 * PI * tp), 2)) * float(targetOpen - targetClosed));
         holdClosedStart = currentTime;
         clearPositionFlags();
       }
@@ -558,7 +552,7 @@ void stateMachine() {
 
 void setup() {
   initButtons();
-  
+
   // Establish Serial Communication with Arduino
 
   Serial.begin(115200);
@@ -584,15 +578,15 @@ void setup() {
   delay(1000);
 
   // Attaching Interrupt Pins to ISR functions to counter encoder changes
-//  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
-//  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
-  attachInterrupt(M1_ENC1_PIN, m1Enc1, CHANGE); // connect encoder to pin 18
-  attachInterrupt(M2_ENC1_PIN, m2Enc1, CHANGE); // connect encoder to pin 20
+  //  attachInterrupt(, m1Enc1, CHANGE); // connect encoder to pin 18
+  //  attachInterrupt(, m2Enc1, CHANGE); // connect encoder to pin 20
+  attachInterrupt(digitalPinToInterrupt(M1_ENC1_PIN), m1Enc1, CHANGE); // connect encoder to pin 18
+  attachInterrupt(digitalPinToInterrupt(M2_ENC1_PIN), m2Enc1, CHANGE); // connect encoder to pin 20
 
   // Uncomment to flip a motor's direction:
   //md.flipM1(true);
   md.flipM2(true);
-  
+
   startupStart = millis();
 }
 
