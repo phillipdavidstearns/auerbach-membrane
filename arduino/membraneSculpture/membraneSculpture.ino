@@ -34,22 +34,19 @@ unsigned long holdClosedStart = 0;
 unsigned long holdClosedEnd = 17500; // duration to hold open in ms
 
 unsigned long startupStart = 0;
-unsigned long startupEnd = 1000; // duration to hold open in ms (was 35000)
+unsigned long startupEnd = 5000; // duration to hold open in ms (was 35000)
 
 // Interrupt Pins for Gear Head Motors
 
-// Motor 1
+// Interrupt pin numbers
 #define M1_ENC1_IRQ_PIN 5 //18
 #define M1_ENC2_IRQ_PIN 4 //19
-
-// Motor 2
 #define M2_ENC1_IRQ_PIN 3 //20
 #define M2_ENC2_IRQ_PIN 2 //21
 
+// Physical pin numbers
 #define M1_ENC1_PIN 18
 #define M1_ENC2_PIN 19
-
-// Motor 2
 #define M2_ENC1_PIN 20
 #define M2_ENC2_PIN 21
 
@@ -113,12 +110,12 @@ float m1Speed = 0; // in rev/s
 float m2Speed = 0; // in rev/s
 
 // Power Variables
-float powerScalar = 3;
-float powerEasing = 0.85;
+float powerScalar = 4;
+float powerEasing = .85;
 int targetWindow = 5; // +/- window for movement cutoff
 int powerLimit = 480; // +/- maximum power sent to motors
-float powerCutoff = 25; // +/- window for power cutoff
-float speedCutoff = 0.01; // +/- window for speed cutoff
+float powerCutoff = 50; // +/- window for power cutoff
+float speedCutoff = 0.02; // +/- window for speed cutoff
 float m1Power = 0;
 float m2Power = 0;
 
