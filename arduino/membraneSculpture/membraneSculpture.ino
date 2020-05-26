@@ -588,8 +588,8 @@ void setup() {
   attachInterrupt(M2_ENC1_IRQ_PIN, m2Enc1, CHANGE); // connect encoder to pin 20
 
   // Uncomment to flip a motor's direction:
-  md.flipM1(true);
-  //md.flipM2(true);
+  //md.flipM1(true);
+  md.flipM2(true);
 
   startupStart = millis();
 }
