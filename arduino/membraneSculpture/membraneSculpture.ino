@@ -410,7 +410,7 @@ void moveToTarget(int _target) {
     }
   }
   md.setM1Speed(m1Power);
-  //stopM1OnFault();
+  stopM1OnFault();
 
   m2PosComp = m2Pos + m2PosOffset;
   float m2Distance = _target - m2PosComp;
@@ -423,7 +423,7 @@ void moveToTarget(int _target) {
     }
   }
   md.setM2Speed(m2Power);
-  //stopM2OnFault();
+  stopM2OnFault();
 
 }
 
@@ -588,8 +588,8 @@ void setup() {
   attachInterrupt(M2_ENC1_IRQ_PIN, m2Enc1, CHANGE); // connect encoder to pin 20
 
   // Uncomment to flip a motor's direction:
-  //md.flipM1(true);
-  md.flipM2(true);
+  md.flipM1(true);
+  //md.flipM2(true);
 
   startupStart = millis();
 }
