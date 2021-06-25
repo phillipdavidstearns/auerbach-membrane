@@ -1,8 +1,11 @@
+
+
 /** Motor Speed Calibrator For Tauba Auerbach by Phillip David Stearns
    calibration routine to set motor speed
 */
 
 // Libraries
+#include <Arduino_JSON.h>
 #include <TimerOne.h> // including the TimerOne library for getting accurate speed readings
 #include <DualG2HighPowerMotorShield.h>
 
@@ -50,44 +53,15 @@ unsigned long startupEnd = 5000; // duration to hold open in ms (was 35000)
 #define M2_ENC1_PIN 20
 #define M2_ENC2_PIN 21
 
-// DELETE: now obsolete with serial control updates
-// IO pins for Button Matrix 
-//#define BUTTON_COL_0 22
-//#define BUTTON_COL_1 23
-//#define BUTTON_COL_2 24
-//#define BUTTON_COL_3 25
-//#define BUTTON_ROW_0 26
-//#define BUTTON_ROW_1 27
-//#define BUTTON_ROW_2 28
-//#define BUTTON_ROW_3 29
-
 // control variables
-
 float stepAngle = 1.0 / 4200.0;
-boolean debug = true;
 boolean moveMotors = true;
-
-// DELETE: now obsolete with serial control updates
-// 4x4 Matrix Buttons
-//const int buttonRows = 4;
-//const int buttonCols = 4;
-//boolean buttonStates[buttonRows][buttonCols];
-//boolean lastButtonStates[buttonRows][buttonCols];
 
 // variables for timing
 unsigned long currentTime = 0;
 
-// DELETE: now obsolete with serial control updates
-//unsigned long buttonInterval = 100; // ms between button polls
-//unsigned long lastButtonScan = 0;
-
-// DELETE: now obsolete with serial control updates
-//unsigned long lastTime = 0;
-//unsigned long statusInterval = 1000; // ms between status update
-
 unsigned long lastMove = 0;
 unsigned long moveInterval = 10; // ms between position updates
-
 
 // Position Variables
 const int initTargetOpen = 2550;
@@ -122,15 +96,6 @@ float powerCutoff = 50; // +/- window for power cutoff
 float speedCutoff = 0.02; // +/- window for speed cutoff
 float m1Power = 0;
 float m2Power = 0;
-
-// EZO-PMP variables
-float startupFlow = 50;                                       // initial ml/min rate of fluid flow
-float runFlow = 8;
-String inputstring = "";                              //a string to hold incoming data from the PC
-String devicestring = "";                             //a string to hold the data from the Atlas Scientific product
-boolean device_string_complete = false;               //have we received all the data from the PC
-boolean sensor_string_complete = false;               //have we received all the data from the Atlas Scientific product
-float ml;                                             //used to hold a floating point number that is the volume
 
 unsigned long ti = 0; // initial time when movement was started
 unsigned long dT = 1; // the amount of time the movement should take
@@ -189,182 +154,7 @@ void clearPositionFlags() {
   isOpen = false;
   isClosed = false;
 }
-//////////////////////////////////////////////////////////////////
-// initButtons()
-// DELETE: now obsolete with serial control updates
 
-//void initButtons() {
-//  // 4x4 MATRIX SETUP
-//
-//  pinMode(BUTTON_COL_0, INPUT_PULLUP);
-//  pinMode(BUTTON_COL_1, INPUT_PULLUP);
-//  pinMode(BUTTON_COL_2, INPUT_PULLUP);
-//  pinMode(BUTTON_COL_3, INPUT_PULLUP);
-//  pinMode(BUTTON_ROW_0, OUTPUT);
-//  pinMode(BUTTON_ROW_1, OUTPUT);
-//  pinMode(BUTTON_ROW_2, OUTPUT);
-//  pinMode(BUTTON_ROW_3, OUTPUT);
-//
-//}
-
-//////////////////////////////////////////////////////////////////
-// readButtons()
-// DELETE: now obsolete with serial control updates
-
-//int readButtons() {
-//  int button = -1;
-//  for (int row = 0 ; row < buttonRows ; row++) {
-//
-//    // set the row pin low
-//    digitalWrite(BUTTON_ROW_0, row != 0);
-//    digitalWrite(BUTTON_ROW_1, row != 1);
-//    digitalWrite(BUTTON_ROW_2, row != 2);
-//    digitalWrite(BUTTON_ROW_3, row != 3);
-//
-//    for (int col = 0 ; col < buttonCols ; col++) {
-//      buttonStates[col][row] = !boolean(digitalRead(BUTTON_COL_0 + col));
-//
-//      // if the button was off but now is on, set button to the number corresponding to it
-//      if (buttonStates[col][row] && !lastButtonStates[col][row]) {
-//        button =  col + row * buttonRows;
-//      }
-//
-//      // store the current state of the buttons for comparision next time around
-//      lastButtonStates[col][row] = buttonStates[col][row];
-//
-//    }
-//  }
-//  return button;
-//}
-
-//////////////////////////////////////////////////////////////////
-// executeButtonAction()
-// DELETE: now obsolete with serial control updates
-
-//void executeButtonAction(int _button) {
-//
-//  if (machineState == CALIBRATE) { // if in calibration mode, buttons have these functions
-//    switch (_button) {
-//      case 0: // BUTTON 01 - decrease position by ~1 degree
-//        m1PosOffset -= 11;
-//        break;
-//
-//      case 1:  // BUTTON 02 - increase position by ~1 degree
-//        m1PosOffset += 11;
-//        break;
-//
-//      case 2: // BUTTON 03 - decrease position by ~10 degrees
-//        m2PosOffset -= 11;
-//        break;
-//
-//      case 3: // BUTTON 04 - increase position by ~10 degrees
-//        m2PosOffset += 11;
-//        break;
-//
-//      case 4: // BUTTON 05 - set open position
-//        targetOpen = target;
-//        break;
-//
-//      case 5: // BUTTON 06 - reset open position
-//        targetOpen = initTargetOpen;
-//        break;
-//
-//      case 6: // set close
-//        targetClosed = target;
-//        break;
-//
-//      case 7: // reset close
-//        targetClosed = initTargetClose;
-//        break;
-//
-//      case 8: // increase speed
-//        //target = targetOpen;
-//        break;
-//
-//      case 9: // decrease speed
-//        //target = targetClosed;
-//        break;
-//
-//      case 10: // reset speed
-//        target -= 110;
-//        break;
-//
-//      case 11: // pause
-//        target += 110;
-//        break;
-//
-//      case 12: // pump rate = startupFlow
-//        //        setFlowRate(startupFlow);
-//        break;
-//
-//      case 13: // pump rate = runFlow
-//        //        setFlowRate(runFlow);
-//        break;
-//
-//      case 14: // pause / resume pump
-//        //        pausePump();
-//        break;
-//
-//      case 15: //
-//        machineState = lastMachineState;
-//        break;
-//    }
-//  } else { // otherwise the machine is in run mode and has these functions
-//    switch (_button) {
-//      case 0: // BUTTON 01 - set state to Open
-//        currentTime = millis();
-//        ti = currentTime;
-//        dT = 5000;
-//        tf = ti + dT;
-//        tp = 0;
-//        machineState = OPEN;
-//        clearPositionFlags();
-//        break;
-//
-//      case 1:  // BUTTON 02 - set state to Close
-//        currentTime = millis();
-//        ti = currentTime;
-//        dT = 5000;
-//        tf = ti + dT;
-//        tp = 0;
-//        machineState = CLOSE;
-//        clearPositionFlags();
-//        break;
-//
-//      case 2: // BUTTON 03 - set state to Startup
-//        machineState = STARTUP;
-//        //        setFlowRate(startupFlow);
-//        clearPositionFlags();
-//        break;
-//
-//      case 3: // BUTTON 04 - enter calibration mode
-//        lastMachineState = machineState;
-//        machineState = CALIBRATE;
-//        clearPositionFlags();
-//        break;
-//    }
-//  }
-//}
-
-//////////////////////////////////////////////////////////////////
-// printButtonStates()
-// DELETE: now obsolete with serial control updates
-// not used. just here for diagnostics
-
-//void printButtonStates() {
-//  Serial.print("Button States: \n");
-//  for (int row = 0 ; row < buttonRows ; row++) {
-//    for (int col = 0 ; col < buttonCols ; col++) {
-//      Serial.print("Col: ");
-//      Serial.print(col);
-//      Serial.print(", Row: ");
-//      Serial.print(row);
-//      Serial.print(", State = ");
-//      Serial.print(buttonStates[col][row]);
-//      Serial.print("\n");
-//    }
-//  }
-//}
 //////////////////////////////////////////////////////////////////
 // MOTION CONTROL FUNCTIONS
 //
@@ -399,6 +189,7 @@ void stopM2OnFault() {
 float ease(float _val, float _target, float _ease) {
   return _ease * (_target - _val);
 }
+
 //////////////////////////////////////////////////////////////////
 //  moveToTarget()
 
@@ -439,51 +230,16 @@ void stopIfFault() {
   stopM2OnFault();
 }
 
-// DELETE: now obsolete with serial control updates
-//void verboseOutput() {
-//  Serial.print("Machine State: ");
-//  Serial.print(machineState);
-//  Serial.print("\tCurrent Target: ");
-//  Serial.print(target);
-//  Serial.print("\tTargetOpen: ");
-//  Serial.print(targetOpen);
-//  Serial.print("\tTargetClose: ");
-//  Serial.print(targetClosed);
-//  Serial.print("\tMotor 1 Power: ");
-//  Serial.print(m1Power);
-//  Serial.print("\tMotor 1 Speed: ");
-//  Serial.print(m1Speed);
-//  Serial.print("\tMotor 1 Position: ");
-//  Serial.print(m1PosComp);
-//  Serial.print("\tMotor 2 Power: ");
-//  Serial.print(m2Power);
-//  Serial.print("\tMotor 2 Speed: ");
-//  Serial.print(m2Speed);
-//  Serial.print("\tMotor 2 Position: ");
-//  Serial.print(m2PosComp);
-//  Serial.println();
-//}
-//// KEYWORDS FOR STATE MACHINE
-//
-//#define CALIBRATE   0
-//#define OPEN        1
-//#define HOLD_OPEN   2
-//#define CLOSE       3
-//#define HOLD_CLOSE  4
-//#define STARTUP     5
-//
-//boolean isOpen;
-//boolean isClosed;
+//////////////////////////////////////////////////////////////////
+// stateMachine()
 
 void stateMachine() {
 
   currentTime = millis();
 
   switch (machineState) {
-
     case CALIBRATE: // calibration
       break;
-
     case OPEN: // open
       if (currentTime >= tf) {
         isOpen = true;
@@ -497,22 +253,18 @@ void stateMachine() {
         clearPositionFlags();
       }
       break;
-
     case HOLD_OPEN: // holding open
       if ( (unsigned long) (currentTime - holdOpenStart) > holdOpenEnd) {
-
         ti = currentTime;
         dT = closeDuration;
         tf = ti + dT;
         tp = 0;
-
         machineState = CLOSE;
         clearPositionFlags();
       } else {
         target = targetOpen;
       }
       break;
-
     case CLOSE: // close
       if (currentTime >= tf) {
         isClosed = true;
@@ -520,42 +272,32 @@ void stateMachine() {
       if (isClosed) {
         machineState = HOLD_CLOSED;
       } else {
-
         tp = float(currentTime - ti) / float(dT);
         target = int((1 - pow(sin(0.5 * PI * tp), 2)) * float(targetOpen - targetClosed));
         holdClosedStart = currentTime;
         clearPositionFlags();
       }
       break;
-
     case HOLD_CLOSED: // holding closed
       if ( (unsigned long) (currentTime - holdClosedStart) > holdClosedEnd) {
-
         ti = currentTime;
         dT = openDuration;
         tf = ti + dT;
         tp = 0;
-
         machineState = OPEN;
         clearPositionFlags();
       } else {
         target = targetClosed;
       }
       break;
-
     case 5: // startup
-
       if ( (unsigned long) (currentTime - startupStart) > startupEnd) {
-        //        setFlowRate(runFlow);
-
         ti = currentTime;
         dT = openDuration;
         tf = ti + dT;
-
         machineState = OPEN;
         clearPositionFlags();
       }
-
       break;
   }
 }
@@ -563,9 +305,6 @@ void stateMachine() {
 // setup()
 
 void setup() {
-  // DELETE: now obsolete with serial control updates
-  //initButtons();
-
   // Establish Serial Communication with Arduino
 
   Serial.begin(115200);
@@ -591,8 +330,6 @@ void setup() {
   delay(1000);
 
   // Attaching Interrupt Pins to ISR functions to counter encoder changes
-  //  attachInterrupt(, m1Enc1, CHANGE); // connect encoder to pin 18
-  //  attachInterrupt(, m2Enc1, CHANGE); // connect encoder to pin 20
   attachInterrupt(M1_ENC1_IRQ_PIN, m1Enc1, CHANGE); // connect encoder to pin 18
   attachInterrupt(M2_ENC1_IRQ_PIN, m2Enc1, CHANGE); // connect encoder to pin 20
 
@@ -607,23 +344,9 @@ void setup() {
 // loop()
 
 void loop() {
-
   currentTime = millis();
-
   if (machineState != CALIBRATE) stateMachine();
-
-//  if ( (currentTime - lastButtonScan) >= buttonInterval) {
-//    executeButtonAction(readButtons());
-//    lastButtonScan = currentTime;
-//  }
-
   if (moveMotors) {
     moveToTarget(target);
   }
-
-//  if (debug && ( (currentTime - lastTime) >= statusInterval)) {
-//    verboseOutput();
-//    lastTime = currentTime;
-//  }
-
 }
