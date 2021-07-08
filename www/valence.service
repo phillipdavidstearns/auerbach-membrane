@@ -1,0 +1,13 @@
+[Unit]
+Description=Valence Web App
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/valence/server.py
+RestartSec=5
+Restart=always
+TimeoutSec=10
+
+[Install]
+WantedBy=multi-user.target
